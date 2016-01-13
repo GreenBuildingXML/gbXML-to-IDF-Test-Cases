@@ -1,0 +1,1710 @@
+<html>
+<head>
+    <title>gbXML IDF Comparison Tests</title>
+    <link rel="stylesheet" type="text/css" href="jqueryui-lightness-1.10.4.css">
+    <script type="text/javascript" language="javascript" src="jquery-1.10.2.js"></script>
+    <script type="text/javascript" language="javascript" src="jqueryui-1.10.4.js"></script>
+    <script type="text/javascript" language="javascript" src="GBIDFTestResults.json"></script>
+    <script type="text/javascript" language="javascript" src="d3.min.js"></script>
+    <script type="text/javascript" language="javascript" src="jquery.isloading.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="fonts.css" />
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <style>
+        div.tooltip {
+            outline: none;
+            position: relative;
+        }
+
+            div.tooltip.donut {
+                position: absolute;
+                text-align: center;
+                width: 120px;
+                height: 60px;
+                padding: 8px;
+                font: 10px sans-serif;
+                background: #fff;
+                border: solid 1px #aaa;
+                border-radius: 4px;
+                pointer-events: none;
+            }
+
+        svg#spaceDonut {
+            display: block;
+            margin: 0 auto;
+        }
+
+        text.inner-circle {
+            font-family: Roboto;
+            font-weight: 400;
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+
+        .arc {
+            cursor: pointer;
+        }
+
+            .arc:hover {
+                opacity: .85;
+            }
+
+            .arc text {
+                font-family: Roboto;
+                font-weight: 300;
+                font-size: 18px;
+                color: #fff;
+            }
+
+        .chart rect {
+            fill: steelblue;
+        }
+
+        .chart text {
+            fill: white;
+            font: 10px sans-serif;
+            text-anchor: end;
+        }
+
+        /*#bars rect {
+            fill: aquamarine
+        }*/
+    </style>
+</head>
+
+<body>
+    <div id="SpaceTests"><h2>Space Test Results</h2></div>
+    <br />
+    <div class="container-fluid">
+        <div id="spaceDonutDiv" class="col-md-3">
+            <svg id="spaceDonut"></svg>
+        </div>
+        <div class="col-md-9">
+            <p>
+                These tests show the results of comparisons between the gbXML and IDF file.  For each gbXML space, these tests try to locate an identical
+                space in the IDF file.  The test assumes that there is a matching space name/ID in both files, once it locates an identical name in both files,
+                then a battery of "individual" tests are performed to identify how closely the two spaces resemble one another in geometrical and internal gain properties.
+                An OVERALL "PASS" or "FAIL" is assigned to each test.  You can see whether a space is "PASS" overall by looking at the header of each test
+                result.  If the header contains the word "PASS" and is a light color, the test has passed overall, meaning each of the individual tests have
+                also passed.  If the header contains the word "FAIL" and is a dark color, the test has not passed overall, meaning some of the individual tests
+                have passed, but not all the individual tests.  These bar and pie charts provide statistics for the test, and identify the individual test failure responsible for the overall test failure.  For space tests, there
+                are 6 individual tests conducted once the space id/names have been matched:  Area test, Volume Test, LPD Test, EPD Test, People Gain Test, and Surfaces Test.
+                You may also click on the header of each test result, and an accodion will open allowing you to see the individual results of each test.
+            </p>
+
+            <p>
+                If any links appear below, this is because one of the individual tests has failed.  If you click on a link, a json file will be downloaded that contains the names
+                of the gbxml objects whose tests have failed.
+            </p>
+            <div class="container-fluid">
+                <a id="areaTestsFailed"> Area Tests Failed </a>
+                <a id="volumeTestsFailed"> Volume Tests Failed </a>
+                <a id="epdTestsFailed"> EPD Tests Failed </a>
+                <a id="lpdTestsFailed"> LPD Tests Failed </a>
+                <a id="peopleGainTestsFailed"> People Gain Tests Failed </a>
+                <a id="surfaceTestsFailed"> Surface Tests Failed </a>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="container-fluid">
+        <div id="spaceBarDiv" class="col-md-6">
+
+        </div>
+
+    </div>
+    <div class="container-fluid">
+        <div id="spSurfaceBarDiv" class="col-md-6">
+
+        </div>
+        <div id="surfaceMatchContainer" class="col-md-3">
+            <svg id="surfaceMatchDonut"></svg>
+        </div>
+        <div id="nonPlanarContainer" class="col-md-3">
+            <svg id="nonPlanarSurfaceDonut"></svg>
+        </div>
+    </div>
+    <br />
+    <div id="spaceAccordions" style="width:1000px"></div>
+    <div id="OpaqueSurfaceTests"><h2>Opaque Surface Test Results</h2></div>
+    <div class="container-fluid">
+        <div id="opaqueDonutDiv" class="col-md-3">
+            <svg id="opaqueDonut"></svg>
+        </div>
+        <div class="col-md-9">
+            <p>
+                These tests show the results of comparisons between the gbXML and IDF File.  For each opaque surface in the gbXML file (a Surface element), an equivalent
+                EnergyPlus surface is attempted to be found.  The test assumes that there is a matching name/ID for a space in both files.  Once an identical surface
+                name as been identified,  a battery of tests are performed to identify how closely the two surfaces resemble one another in description of construction,
+                type, exposure conditions, and adjacency conditions.  An overall "PASS" or "FAIL" is assigned to each test.  You can see whether a surface is "PASS"
+                overall by looking at the header of each test result.  If the header contains the word "PASS" and is a light color, the test has passed overall,
+                meaning each of the individual tests have also passed.  If the header contains the word "FAIL" and is a dark color, the test has not passed overall, meaning some of the individual tests
+                have passed, but one or more of the individual tests has failed.  These bar and pie charts provide statistics for the test, and identify the individual test failure responsible for the overall test failure.
+                If you wish, you may also click on the header of any test result, and an accordion will open allowing to you to see the individual results of each test.
+            </p>
+
+            <p>
+                If any links appear below, this is because one of the individual tests has failed.  If you click on a link, a json file will be downloaded that contains the names
+                of the gbxml objects whose tests have failed.
+            </p>
+            <div class="container-fluid">
+                <a id="surfaceIdTestsFailed"> Surface ID Match Tests Failed </a>
+                <a id="surfaceTypeTestsFailed"> SurfaceType Match Tests Failed </a>
+                <a id="constructionNameTestsFailed"> Construction Name Match Tests Failed </a>
+                <a id="windExposureTestsFailed"> E+ Wind Exposure Tests Failed </a>
+                <a id="sunExposureTestsFailed"> E+ Sun Exposure Tests Failed </a>
+                <a id="adjacencyConditionTestsFailed"> Adjacency Condition Tests Failed </a>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div id="opSurfaceBarDiv" class="col-md-6">
+
+        </div>
+        <div id="opSurfaceTypeBarDiv" class="col-md-6">
+
+        </div>
+    </div>
+    <br />
+    <div id="opaqueAccordions" style="width:1000px"></div>
+    <div id="OpeningTests"><h2>Opening Test Results</h2></div>
+    <div class="container-fluid">
+        <div id="openingDonutDiv" class="col-md-3">
+            <svg id="openingMatchDonut"></svg>
+        </div>
+        <div class="col-md-9">
+            <p>
+                These tests show the results of comparisons between the gbXML and IDF Files' openings (doors and windows).  For each unique opening found in the gbXML file, an associated
+                opening in the EnergyPlus opening definitions is attempted to be found.  The test assumes there is a matching name/id for the opening
+                in the EnergyPlus file, for each opening in the gbXML file.  If an opening name match is identified, a battery of tests are performed
+                to identify how closely the gbXML and EnergyPlus openings resemble one another in description of the parent holding the opening, construction assignment,
+                and width and height.  An overall "PASS" or "FAIL" is assigned to each test.  You can see whether a test is "PASS" overall by looking at the header of each test result.
+                If the header contains the word "PASS" and is a light color, the test has passed overall, meaning each of the individual tests have also passed.
+                If the header contains the word "FAIL" and is a dark color, the test has not passed overall, meaning some of the individual tests have passed, but one or more of the individual tests has failed.
+                These bar and pie charts provide statistics for the test, and identify the individual test failure responsible for the overall test failure.
+                If you click on the header, you can see the individual results of each test.
+            </p>
+            <p>
+                If any links appear below, this is because one of the individual tests has failed.  If you click on a link, a json file will be downloaded that contains the names
+                of the gbxml objects whose tests have failed.
+            </p>
+            <div class="container-fluid">
+                <a id="openingIdTestsFailed"> Opening Name Match Failed </a>
+                <a id="parentNameTestsFailed"> Parent Name Match Failed </a>
+                <a id="opConstrNameTestsFailed"> Construction Name Match Failed </a>
+                <a id="openingWidthTestsFailed"> Opening Width Match Failed </a>
+                <a id="openingHeightTestsFailed"> Opening Height Match Failed </a>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div id="openingMatchBarDiv" class="col-md-6">
+
+        </div>
+        <div id="openingSurfaceBarDiv" class="col-md-6">
+
+        </div>
+    </div>
+    <br />
+    <div id="openingAccordions" style="width:1000px"></div>
+    <div id="ConstructionTests"><h2>Opaque  Construction Test Results</h2></div>
+    <div>
+        These tests show the results of comparisons between the gbXML and IDF File.  For each unique construction definition in the gbXML file, an associated
+        construction in the EnergyPlus construction definitions is attempted to be found.  The test assumes there is a matching name/id for the construction
+        in the EnergyPlus file, for every construction name in the gbXML file.  If a construction name match is identified, a battery of tests are performed
+        to identify how closely the gbXML and EnergyPlus construction resemble one another in description of layer arrangement, and the physical characteristics
+        of each layer.  An overall "PASS" or "FAIL" is assigned to each test.  You can see whether a test is "PASS" overall by looking at the header of each test result.
+        If the header contains the word "PASS" and is a light color, the test has passed overall, meaning each of the individual tests have also passed.
+        If the header contains the word "FAIL" and is a dark color, the test has not passed overall, meaning some of the individual tests have passed, but not all the individual tests.
+        If you click on the header, you can see the individual results of each test.
+    </div>
+    <div id="constructionAccordions" style="width:1000px"></div>
+    <div id="OpeningConstructionTests"><h2>Window  Construction Test Results</h2></div>
+    <div>
+        These tests show the results of comparisons between the gbXML and IDF File.  For each unique opening construction definition in the gbXML file, an associated
+        construction in the EnergyPlus construction definitions is attempted to be found.  The test assumes there is a matching name/id for the construction
+        in the EnergyPlus file, for every construction name in the gbXML file.  If a construction name match is identified, a battery of tests are performed
+        to identify how closely the gbXML and EnergyPlus construction resemble one another in description of layer arrangement, and the physical characteristics
+        of each layer.  An overall "PASS" or "FAIL" is assigned to each test.  You can see whether a test is "PASS" overall by looking at the header of each test result.
+        If the header contains the word "PASS" and is a light color, the test has passed overall, meaning each of the individual tests have also passed.
+        If the header contains the word "FAIL" and is a dark color, the test has not passed overall, meaning some of the individual tests have passed, but not all the individual tests.
+        If you click on the header, you can see the individual results of each test.
+    </div>
+    <div id="openingConstructionAccordions" style="width:1000px"></div>
+    <div id="ScheduleTests"><h2>Schedule Test Results</h2></div>
+    <div>
+        These tests compare the YearSchedules (and their associated Week and Day Schedules) in the GBXML and IDF Files.  Looping through successive GBXML YearSchedule definitions, the tests take each successive
+        YearSchedule id value, and attempts to find an equivalent name in the IDF.  Once the name is found, the test continues by performing a series of subtests.  Do the intervals for the weekly schedules match?
+        Do the names of the Weekly Schedules in between these intervals match?  Then, for each weekly schedule mentioned, more tests are performed to ensure that the same day schedules are mentioned for each day
+        in the Weekly Schedule definition in both GBXML and IDF.  If names are not the same each day of the week, this test would fail.
+        Finally, for each Day Schedule mentioned, the Day Schedule Type is checked and for each hour, the values in both IDF and GBXML are compared.
+        A large discrepancy between values for each hour, as well as a type mismatch, would cause a failure of this test.
+    </div>
+    <div id="scheduleAccordions" style="width:1000px"></div>
+</body>
+</html>
+<script type="text/javascript">
+    var gasTypeDict =
+        {
+            0: "Air",
+            1: "Argon",
+            2: "Krypton",
+            3: "CO2",
+            4: "SF6",
+            5: "Custom"
+        }
+
+    $(document).ready(function (e) {
+        
+        //start the space report
+        var spaceReport = jsonObject.spaceReportArray;
+        spaceReport.sort(compareTF("sMatchOverall"));
+        console.log("Space report ", spaceReport);
+        makeSpaceHTML(spaceReport);
+        
+        //start opaque surface report
+        var opSurfReport = jsonObject.surfaceReportArray;
+        opSurfReport.sort(compareTF("surfMatchOverall"));
+        console.log("Surface report ", opSurfReport);
+        makeOpaqueSurfaceHTML(opSurfReport);
+
+        //start the opening report
+        var openingReport = jsonObject.openingReportArray;
+        openingReport.sort(compareTF("opMatchOverall"));
+        console.log("Opening report ", openingReport);
+        makeOpeningHTML(openingReport);
+
+	    //start the construction report
+	    var constructionReport = jsonObject.constructionReportArray
+	    //sort the report by which ones totall passed, and which ones did not
+	    constructionReport.sort(compareTF("cMatchOverall"));
+	    console.log(constructionReport);
+	    makeConstructionHTML(constructionReport);
+	    
+	    var openingConstructionReport = jsonObject.openingConstructionReportArray;
+	    openingConstructionReport.sort(compareTF("cMatchOverall"));
+	    console.log(openingConstructionReport);
+	    makeOpeningConstructionHTML(openingConstructionReport);
+
+	    var scheduleReport = jsonObject.scheduleReportArray;
+	    scheduleReport.sort(compareTF("OverallMatch"));
+	    console.log(scheduleReport);
+	    makeScheduleHTML(scheduleReport);
+
+   });
+
+    function makeSpaceHTML(spaceReport) {
+        
+        console.log("Making Space Report");
+        var totalGBSurfaces = 0;
+        var areaTestsObject = {
+            name: "Space Floor Area Tests",
+            gbXMLSpaceNameArray: []
+        };
+        var volumeTestsObject = {
+            name: "Space Calculated Volume Tests",
+            gbXMLSpaceNameArray: []
+        };
+        var LPDTestsObject = {
+            name: "Space LPD Tests",
+            gbXMLSpaceNameArray: []
+        };
+        var EPDTestsObject = {
+            name: "Space EPD Tests",
+            gbXMLSpaceNameArray: []
+        };
+        var peopleGainTestsObject = {
+            name: "Space People Gain Tests",
+            gbXMLSpaceNameArray: []
+        };
+        var surfaceTestsObject = {
+            name: "Space Surfaces Tests",
+            gbXMLSurfaceNameArray: []
+        };
+        var spacesMatchedObj = {
+            "Matched": 0,
+            "Not Matched": 0,
+            individualTests: {
+                "Area Tests Failed": 0,
+                "Volume Tests Failed": 0,
+                "LPD Tests Failed": 0,
+                "EPD Tests Failed": 0,
+                "People Gain Tests Failed": 0,
+                "Surface Tests Failed": 0
+            }
+        }
+
+
+        var html = "";
+        var htmlbreak = "<br />"
+        var endWrap = "<br /></div>"
+        $.each(spaceReport, function (ind, val) {
+            //console.log(ind);
+            if (val.sMatchOverall) { html = makeHeader("Space Test " + (ind + 1) + " : PASS, Space Name: " + val.gbSpName, html); spacesMatchedObj["Matched"]++; }
+            else { html = makeHeader("Space Test " + (ind + 1) + " : FAIL, Space Name: " + val.gbSpName, html); spacesMatchedObj["Not Matched"]++; }
+
+            if (val.snameMatch) { html += "<div><div class=\"row\"><h4>PASS: Space Names Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div><div class=\"row\"><h4>PASS: Space Names DO NOT Match in gbXML and idf File</h4></div>"; }
+            html = makeResultRow("gbXML Name", val.gbSpName, "EnergyPlus Name", val.epSpName, html, htmlbreak);
+
+            if (val.spAreaMatch) { html += "<div class=\"row\"><h4>PASS: Space Areas Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Space Areas DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["Area Tests Failed"]++; areaTestsObject.gbXMLSpaceNameArray.push(val.gbSpName); }
+            html = makeSubHeader("gbXML Space", "EnergyPlus Space", html);
+            html = makeResultRow("Area Value", val.gbArea, "Area Value", val.epArea, html);
+            html = makeResultRow("Area Units", val.areaUnits, "Area Units", val.areaUnits, html, htmlbreak);
+
+            if (val.spVolumeMatch) { html += "<div class=\"row\"><h4>PASS: Space Volumes Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Space Volumes DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["Volume Tests Failed"]++; volumeTestsObject.gbXMLSpaceNameArray.push(val.gbSpName); }
+            html = makeSubHeader("gbXML Space", "EnergyPlus Space", html);
+            html = makeResultRow("Volume Value", val.gbArea, "Volume Value", val.epArea, html);
+            html = makeResultRow("Volume Units", val.volumeUnits, "Volume Units", val.volumeUnits, html, htmlbreak);
+
+            if (val.sLPDMatch) { html += "<div class=\"row\"><h4>PASS: Space Lighting Power Densities Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Space Lighting Power Densities DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["LPD Tests Failed"]++; LPDTestsObject.gbXMLSpaceNameArray.push(val.gbSpName); }
+            html = makeSubHeader("gbXML Space", "EnergyPlus Space", html);
+            html = makeResultRow("LPD Value", val.gbLPD, "LPD Value", val.epLPD, html);
+            html = makeResultRow("LPD Schedule", val.gbLPDSched, "LPD Schedule", val.epLPDSched, html);
+            html = makeResultRow("LPD Units", val.LPDUnits, "LPD Units", val.LPDUnits, html, htmlbreak);
+
+            if (val.sEPDMatch) { html += "<div class=\"row\"><h4>PASS: Space Equipment Power Densities Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Space Equipment Power Densities DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["EPD Tests Failed"]++; EPDTestsObject.gbXMLSpaceNameArray.push(val.gbSpName); }
+            html = makeSubHeader("gbXML Space", "EnergyPlus Space", html);
+            html = makeResultRow("EPD Value", val.gbEPD, "EPD Value", val.epEPD, html);
+            html = makeResultRow("EPD Schedule", val.gbEPDSched, "EPD Schedule", val.epEPDSched, html);
+            html = makeResultRow("EPD Units", val.EPDUnits, "EPD Units", val.EPDUnits, html, htmlbreak);
+
+            if (val.sPeopleGainMatch) { html += "<div class=\"row\"><h4>PASS: Space People Gain Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Space People Gain DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["People Gain Tests Failed"]++; peopleGainTestsObject.gbXMLSpaceNameArray.push(val.gbSpName); }
+            html = makeSubHeader("gbXML Space", "EnergyPlus Space", html);
+            html = makeResultRow("Num People", val.gbNumPeop, "Num People", val.epNumPeop, html);
+            html = makeResultRow("Num People Sched", val.gbNumPeopSched, "Num People Sched", val.epNumPeopSched, html);
+            html = makeResultRow("Total Heat Per Person", val.gbTotalHeatPeak, "Total Heat Per Person", val.epTotalHeatPeak, html);
+            html = makeResultRow("Sens Heat Per Person", val.gbSensHeatPeak, "Sens Heat Per Person", val.epSensHeatPeak, html);
+            html = makeResultRow("Lat Heat Per Person", val.gbLatentHeatPeak, "Lat Heat Per Person", val.epLatentHeatPeak, html);
+            html = makeResultRow("Peak Units", val.peoplePeakUnits, "Peak Units", val.peoplePeakUnits, html, htmlbreak);
+            
+            if (val.surfacesMatch && val.surfaceCountMatch) { html += "<div class=\"row\"><h4>PASS: Surfaces for this Space Match in gbXML and idf File</h4></div>"; }
+            else { html += "<div class=\"row\"><h4>PASS: Surfaces for this Space DO NOT Match in gbXML and idf File</h4></div>"; spacesMatchedObj.individualTests["Surface Tests Failed"]++; }
+            html = makeSubHeader("gbXML Surfaces", "EnergyPlus Surfaces", html);
+            html = makeResultRow("Number of Surfaces", val.gbSpaceSurfaceCount, "Number of Surfaces", val.epSpaceSurfaceCount, html, htmlbreak);
+            $.each(val.surfacesTest, function (ind2, val2) {
+                totalGBSurfaces++;
+                var copystring = val2.epSurface.name.slice(-4);
+                if(copystring == "Copy")
+                {
+                    var nocopy = val2.epSurface.name.slice(0,-4);
+                    if (val2.gbSurface.name != nocopy && val2.gbSurface.tilt != "NaN") {
+                        surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "No ID Match" });
+                    }
+                }
+                else
+                {
+                    if (val2.gbSurface.name != val2.epSurface.name && val2.gbSurface.tilt != "NaN") {
+                        surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "No ID Match" });
+                    }
+                }
+                if (val2.gbSurface.tilt == "NaN") { surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Non planar surface found" }); }
+                else {
+                    if(copystring == "Copy")
+                    {
+                        //this is a roof or a floor/ceiling
+                        if (Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) < 0.1 || Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) > 179.9) {
+                            //tilt is ok, so don't worry about it, but for azimuth
+                            if (val2.gbSurface.azimuth < 180)
+                            {
+                                var newAz = val2.gbSurface.azimuth + 180;
+                                if(Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1)
+                                {
+                                    //do nothing
+                                }
+                                else
+                                {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                            }
+                            else if (val2.gbSurface.azimuth >= 180) {
+                                var newAz = val2.gbSurface.azimuth - 180;
+                                if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1) {
+                                    //do nothing
+                                }
+                                else {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                            }
+                        }
+                        else if(Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) < 0.1 || (Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) > 89.9 && Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) < 90.1))
+                        {
+                            // do nothing for tilt, we know we are good
+                            if (val2.gbSurface.azimuth < 180) {
+                                var newAz = val2.gbSurface.azimuth + 180;
+                                if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1) {
+                                    //do nothing
+                                }
+                                else {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                            }
+                            else if (val2.gbSurface.azimuth >= 180) {
+                                var newAz = val2.gbSurface.azimuth - 180;
+                                if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1) {
+                                    //do nothing
+                                }
+                                else {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                                surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Tilt Mismatch" });
+                            }
+                        }
+                        else {
+                            surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Tilt Mismatch" });
+                            if (val2.gbSurface.azimuth < 180) {
+                                var newAz = val2.gbSurface.azimuth + 180;
+                                if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1) {
+                                    //do nothing
+                                }
+                                else {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                            }
+                            else if (val2.gbSurface.azimuth >= 180) {
+                                var newAz = val2.gbSurface.azimuth - 180;
+                                if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) < 0.1 || Math.abs(newAz - val2.epSurface.azimuth) < 0.1) {
+                                    //do nothing
+                                }
+                                else {
+                                    surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" });
+                                }
+                                surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Tilt Mismatch" });
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //they should be exactly the same
+                        if (Math.abs(val2.gbSurface.tilt - val2.epSurface.tilt) > 0.1) { surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Tilt Mismatch" }); }
+                        if (Math.abs(val2.gbSurface.azimuth - val2.epSurface.azimuth) > 0.1) { surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Azimuth Mismatch" }); }
+                    }
+                    
+                }
+                //console.log("Surface:", ind2)
+                html = makeSubHeader("gbXML Surface Name: " + val2.gbSurface.name, "EnergyPlus Surface Name: " + val2.epSurface.name, html);
+                html = makeResultRow("NumVertices", val2.gbSurface.numVertices, "NumVertices", val2.epSurface.numVertices, html);
+                html = makeResultRow("Coordinates", "", "Coordinates", "", html);
+                if (val2.gbSurface.coordinates.length === 1)
+                {
+                    var gbx = (cval.X).toFixed(3);
+                    var gby = (cval.Y).toFixed(3);
+                    var gbz = (cval.Z).toFixed(3);
+                    if(gbx === -1.0 && gby === -1.0 && gbz === -1.0)
+                    {
+                        surfaceTestsObject.gbXMLSurfaceNameArray.push({ "name": val2.gbSurface.name, "cause": "Coordinates Mismatch" });
+                    }
+
+                }
+                $.each(val2.gbSurface.coordinates, function (cind, cval) {
+                    var gbx = (cval.X * .3048).toFixed(3);
+                    var gby = (cval.Y * .3048).toFixed(3);
+                    var gbz = (cval.Z * .3048).toFixed(3);
+                    var gbline = cind + ": (" + gbx + "," + gby + "," + gbz + ")";
+                    var epline = "";
+                    try {
+                        var epx = (val2.epSurface.coordinates[cind].X).toFixed(3);
+                        var epy = (val2.epSurface.coordinates[cind].Y).toFixed(3);
+                        var epz = (val2.epSurface.coordinates[cind].Z).toFixed(3);
+                        epline = cind + ": (" + epx + "," + epy + "," + epz + ")";
+                    }
+                    catch (ExceptionInformation) { console.log("Error: ", val2.epSurface.name); }
+
+                    html = makeResultRow("Coord ", gbline, "Coord ", epline, html);
+                })
+                html = makeResultRow("Tilt", val2.gbSurface.tilt, "Tilt", val2.epSurface.tilt, html);
+                
+                if (ind2 === val.surfacesTest.length - 1) {
+                    //console.log("Here.")
+                    html = makeResultRow("Azimuth", val2.gbSurface.azimuth, "Azimuth", val2.epSurface.azimuth, html, endWrap);
+                }
+                else {
+                    html = makeResultRow("Azimuth", val2.gbSurface.azimuth, "Azimuth", val2.epSurface.azimuth, html, htmlbreak);
+                }
+            });
+        });
+        //console.log("Space Matching Stats", spacesMatchedObj)
+        $("#spaceAccordions").html(html);
+
+        $("#spaceAccordions").accordion(
+           {
+               active: false,
+               collapsible: true
+           }
+        );
+        var headers = $(".ui-accordion-header");
+        $.each(headers, function (ind, val) {
+            //search for FAIL
+            var re = new RegExp("FAIL");
+            var res = re.test(val.textContent);
+            if (res) {
+                //console.log(val);
+                val.style.backgroundColor = "#080296";
+            }
+        })
+
+        //make donut chart
+        var d3Data = [
+            {
+                label: "Spces Passing",
+                value: spacesMatchedObj["Matched"]
+            },
+            {
+                label: "Spaces Failed",
+                value: spacesMatchedObj["Not Matched"]
+            }
+        ]
+        var spaceMatchedPercent = spacesMatchedObj["Matched"] / (spacesMatchedObj["Matched"] + spacesMatchedObj["Not Matched"]) * 100;
+        var spaceNotMatchedPercent = 100 - spaceMatchedPercent;
+        makeCircleChartD3(d3Data, spaceMatchedPercent.toFixed(1), "#spaceDonut", "Spaces Test Pass");
+        //make bar chart
+        var categories = [""];
+        var values = [0];
+        for (var c in spacesMatchedObj.individualTests) {
+            categories.push(c);
+            values.push(spacesMatchedObj.individualTests[c])
+        }
+        MakeD3HorizontalBarChartD3(categories,values, "Individual Test Failure Count", "steelblue", "#spaceBarDiv");
+        
+
+        //make final space surfaces  bar chart
+        var nonPlanarSurfaces = [];
+        var unmatchedSurfaces = [];
+        var tiltMismatchSurfaces = [];
+        var azMismatchSurfaces = [];
+        var coordinateMismatches = [];
+
+        var l = surfaceTestsObject.gbXMLSurfaceNameArray.length;
+        while (l--) {
+            if (surfaceTestsObject.gbXMLSurfaceNameArray[l].cause == "No ID Match") { unmatchedSurfaces.push(surfaceTestsObject.gbXMLSurfaceNameArray[l].name) }
+            if (surfaceTestsObject.gbXMLSurfaceNameArray[l].cause == "Coordinates Mismatch") { coordinateMismatches.push(surfaceTestsObject.gbXMLSurfaceNameArray[l].name) }
+            if (surfaceTestsObject.gbXMLSurfaceNameArray[l].cause == "Non planar surface found") { nonPlanarSurfaces.push(surfaceTestsObject.gbXMLSurfaceNameArray[l].name) }
+            if (surfaceTestsObject.gbXMLSurfaceNameArray[l].cause == "Tilt Mismatch") { tiltMismatchSurfaces.push(surfaceTestsObject.gbXMLSurfaceNameArray[l].name) }
+            if (surfaceTestsObject.gbXMLSurfaceNameArray[l].cause == "Azimuth Mismatch") { azMismatchSurfaces.push(surfaceTestsObject.gbXMLSurfaceNameArray[l].name) }
+        }
+        //console.log("Nonplanar surfaces: ", nonPlanarSurfaces);
+        //console.log("Unmatched surface: ", unmatchedSurfaces);
+        //console.log("Mismatched tilts: ", tiltMismatchSurfaces);
+        //console.log("Mismatched azs: ", azMismatchSurfaces);
+        //console.log("coordinateMismatches: ", coordinateMismatches);
+        //console.log("Total GBXML surfaces", totalGBSurfaces);
+
+        var percentageMatched = (totalGBSurfaces - unmatchedSurfaces.length) / totalGBSurfaces * 100;
+        var percentagePlanar = (totalGBSurfaces - nonPlanarSurfaces.length) / totalGBSurfaces * 100;
+        d3Data = [
+            {
+                label: "Matched surfaces",
+                value: (totalGBSurfaces - unmatchedSurfaces.length)
+            },
+            {
+                label: "Unmatched surfaces",
+                value: unmatchedSurfaces.length
+            }
+        ];
+        makeCircleChartD3(d3Data, percentageMatched.toFixed(1), "#surfaceMatchDonut", "Surface Match")
+        d3Data = [
+            {
+                label: "Planar surfaces",
+                value: (totalGBSurfaces - nonPlanarSurfaces.length)
+            },
+            {
+                label: "Non-planar surfaces",
+                value: nonPlanarSurfaces.length
+            }
+        ];
+        makeCircleChartD3(d3Data, percentagePlanar.toFixed(1), "#nonPlanarSurfaceDonut", "Planar Surface")
+
+        //summarize the space surface tests
+        var barchartobj = {
+            "Failed ID Match": unmatchedSurfaces.length,
+            "Mismatched Coords": coordinateMismatches.length,
+            "Mismatched Azimuth": azMismatchSurfaces.length,
+            "Mismatched Tilt": tiltMismatchSurfaces.length,
+            "Non-planar Surfaces": nonPlanarSurfaces.length
+        }
+        categories = [""];
+        values = [0];
+        for (var c in barchartobj) {
+            categories.push(c);
+            values.push(barchartobj[c])
+        }
+        MakeD3HorizontalBarChartD3(categories,values, "Reasons for Surface Test Failure", "aquamarine", "#spSurfaceBarDiv")
+
+
+        if (areaTestsObject.gbXMLSpaceNameArray.length === 0) {
+            //disable the link
+            $("#areaTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(areaTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#areaTestsFailed").attr("href", "data:" + testObjectString)
+            $("#areaTestsFailed").attr("download", "AreaTestData.json")
+
+        }
+
+        if (volumeTestsObject.gbXMLSpaceNameArray.length === 0) {
+            //disable the link
+            $("#volumeTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(volumeTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#volumeTestsFailed").attr("href", "data:" + testObjectString)
+            $("#volumeTestsFailed").attr("download", "VolumeTestData.json")
+
+        }
+
+        if (EPDTestsObject.gbXMLSpaceNameArray.length === 0) {
+            //disable the link
+            $("#epdTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(EPDTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#epdTestsFailed").attr("href", "data:" + testObjectString)
+            $("#epdTestsFailed").attr("download", "EPDTestData.json")
+
+        }
+
+        if (LPDTestsObject.gbXMLSpaceNameArray.length === 0) {
+            //disable the link
+            $("#lpdTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(LPDTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#lpdTestsFailed").attr("href", "data:" + testObjectString)
+            $("#lpdTestsFailed").attr("download", "LPDTestData.json")
+
+        }
+
+        if (peopleGainTestsObject.gbXMLSpaceNameArray.length === 0) {
+            //disable the link
+            $("#peopleGainTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(peopleGainTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#peopleGainTestsFailed").attr("href", "data:" + testObjectString)
+            $("#peopleGainTestsFailed").attr("download", "PeopleGainTestData.json")
+
+        }
+
+        if (surfaceTestsObject.gbXMLSurfaceNameArray.length === 0) {
+            //disable the link
+            $("#surfaceTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceTestsObject));
+            //enable the link and make the link ready to download the file in question
+            $("#surfaceTestsFailed").attr("href", "data:" + testObjectString)
+            $("#surfaceTestsFailed").attr("download", "SurfaceTestData.json")
+
+        }
+
+    }
+
+    function makeOpeningHTML(openingReport)
+    {
+        var totalGBOpenings = 0;
+        var openingMatchedObj = {
+            "Matched": 0,
+            "Not Matched": 0,
+            individualTests: {
+                "Opening Name Match Failed": [],
+                "Opening Parent Match Failed": [],
+                "Opening Construction Match Failed": [],
+                "Opening Width Match Failed": [],
+                "Opening Height Match Failed": []
+            }
+        }
+        var html = "";  
+        var htmlbreak = "<br />"
+        var endWrap = "<br /></div>"
+        $.each(openingReport, function (ind, val) {
+            var nameMatchFailed = false;
+            totalGBOpenings++;
+            //console.log(ind);
+            if (val.opMatchOverall) { html = makeHeader("Opening Test " + (ind + 1) + " : PASS, "+val.gbOpName, html); openingMatchedObj["Matched"]++; }
+            else { html = makeHeader("Opening Test " + (ind + 1) + " : FAIL, "+val.gbOpName, html); }
+            if (val.opNameMatch) { html += "<div><div class=\"row\"><h4>PASS: Opening Names Match in gbXML and idf File</h4></div>"; }
+            else {
+                nameMatchFailed = true;
+                html += "<div><div class=\"row\"><h4>FAIL: Opening Names DO NOT Match in gbXML and idf File</h4></div>";
+                var object = {
+                    openingName: val.gbOpName,
+                    parentName: val.gbParentName,
+                    parentSurfaceType: val.gbParentType
+                };
+                openingMatchedObj["Not Matched"]++;
+                openingMatchedObj.individualTests["Opening Name Match Failed"].push(object);
+            }
+            html = makeResultRow("gbXML Name", val.gbOpName, "EnergyPlus Name", val.epOpName, html, htmlbreak);
+
+            if (val.opParentMatch) { html += "<div class=\"row\"><h4>PASS: Openings' Parents Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Openings' Parents DO NOT Match in gbXML and idf File</h4></div>";
+                if(nameMatchFailed)
+                {
+                    //do nothing
+                }
+                else
+                {
+                    openingMatchedObj.individualTests["Opening Parent Match Failed"].push(val.gbOpName);
+                }
+            }
+            html = makeSubHeader("gbXML Opening", "EnergyPlus Opening", html);
+            html = makeResultRow("Parent Name", val.gbParentName, "Parent Name", val.epParentName, html, htmlbreak);
+
+            if (val.opConstructionMatch) { html += "<div class=\"row\"><h4>PASS: Openings' Constructions Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Openings' Constructions DO NOT Match in gbXML and idf File</h4></div>";
+                if (nameMatchFailed) {
+                    //do nothing
+                }
+                else {
+                    openingMatchedObj.individualTests["Opening Construction Match Failed"].push(val.gbOpName);
+                }
+            }
+            html = makeSubHeader("gbXML Opening", "EnergyPlus Opening", html);
+            html = makeResultRow("Construction", val.gbOpConstName, "Construction", val.epOpConstName, html, htmlbreak);
+
+            if (val.opWidthMatch) { html += "<div class=\"row\"><h4>PASS: Openings' Width Definitions Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Openings' Width Definitions DO NOT Match in gbXML and idf File</h4></div>";
+                if (nameMatchFailed) {
+                    //do nothing
+                }
+                else {
+                    openingMatchedObj.individualTests["Opening Width Match Failed"].push(val.gbOpName);
+                }
+            }
+            html = makeSubHeader("gbXML Opening", "EnergyPlus Opening", html);
+            html = makeResultRow("Width", val.gbOpWidth, "Width", val.epOpWidth, html, htmlbreak);
+
+            if (val.opHeightMatch) { html += "<div class=\"row\"><h4>PASS: Openings' Height Definitions Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Openings' Height Definitions DO NOT Match in gbXML and idf File</h4></div>";
+                if (nameMatchFailed) {
+                    //do nothing
+                }
+                else {
+                    openingMatchedObj.individualTests["Opening Height Match Failed"].push(val.gbOpName);
+                }
+            }
+            html = makeSubHeader("gbXML Opening", "EnergyPlus Opening", html);
+            html = makeResultRow("Height", val.gbOpHeight, "Height", val.epOpHeight, html, endWrap);
+
+        });
+
+        $("#openingAccordions").html(html);
+
+        $("#openingAccordions").accordion(
+           {
+               active: false,
+               collapsible: true
+           }
+        );
+        var headers = $(".ui-accordion-header");
+        $.each(headers, function (ind, val) {
+            //search for FAIL
+            var re = new RegExp("FAIL");
+            var res = re.test(val.textContent);
+            if (res) {
+                //console.log(val);
+                val.style.backgroundColor = "#080296";
+            }
+        })
+
+        console.log("Opening matched obj: ", openingMatchedObj);
+        // make the circle donut chart
+        var percentageMatched = (totalGBOpenings - openingMatchedObj["Not Matched"]) / totalGBOpenings * 100;
+        d3Data = [
+            {
+                label: "Matched openings",
+                value: openingMatchedObj["Matched"]
+            },
+            {
+                label: "Unmatched openings",
+                value: openingMatchedObj["Not Matched"]
+            }
+        ];
+        makeCircleChartD3(d3Data, percentageMatched.toFixed(1), "#openingMatchDonut", "Opening Match")
+        //make the bar charts
+        var categories = [""];
+        var values = [0];
+        for (var c in openingMatchedObj.individualTests) {
+            categories.push(c);
+            values.push(openingMatchedObj.individualTests[c].length)
+        }
+        MakeD3HorizontalBarChartD3(categories, values, "Opening Match Failure Distribution", "steelblue", "#openingMatchBarDiv");
+
+        categories = ["", "InteriorFloor", "SlabOnGrade", "Ceiling", "Floor/Ceiling", "InteriorWall", "ExteriorWall", "Roof"];
+        values = [];
+        for (var c in categories) {
+            var res = openingMatchedObj.individualTests["Opening Name Match Failed"].filter(function (obj) {
+                return obj.parentSurfaceType === categories[c];
+            })
+            values.push(res.length);
+        }
+        console.log("Opening Categories:", categories);
+        console.log("Opening Values:", values);
+        MakeD3HorizontalBarChartD3(categories, values, "Failed Opening Name Match Parent SurfaceType", "aquamarine", "#openingSurfaceBarDiv");
+
+        //provide hyperlinks
+        if (openingMatchedObj.individualTests["Opening Name Match Failed"].length === 0) {
+            //disable the link
+            $("#openingIdTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(openingMatchedObj.individualTests["Opening Name Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#openingIdTestsFailed").attr("href", "data:" + testObjectString)
+            $("#openingIdTestsFailed").attr("download", "OpeningIDMatchTestData.json")
+        }
+        if (openingMatchedObj.individualTests["Opening Parent Match Failed"].length === 0) {
+            //disable the link
+            $("#parentNameTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(openingMatchedObj.individualTests["Opening Parent Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#parentNameTestsFailed").attr("href", "data:" + testObjectString)
+            $("#parentNameTestsFailed").attr("download", "OpeningParentMatchTestData.json")
+        }
+        if (openingMatchedObj.individualTests["Opening Construction Match Failed"].length === 0) {
+            //disable the link
+            $("#opConstrNameTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(openingMatchedObj.individualTests["Opening Construction Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#opConstrNameTestsFailed").attr("href", "data:" + testObjectString)
+            $("#opConstrNameTestsFailed").attr("download", "OpeningConstructionMatchTestData.json")
+        }
+        if (openingMatchedObj.individualTests["Opening Width Match Failed"].length === 0) {
+            //disable the link
+            $("#openingWidthTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(openingMatchedObj.individualTests["Opening Width Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#openingWidthTestsFailed").attr("href", "data:" + testObjectString)
+            $("#openingWidthTestsFailed").attr("download", "OpeningWidthMatchTestData.json")
+        }
+        if (openingMatchedObj.individualTests["Opening Height Match Failed"].length === 0) {
+            //disable the link
+            $("#openingHeightTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(openingMatchedObj.individualTests["Opening Height Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#openingHeightTestsFailed").attr("href", "data:" + testObjectString)
+            $("#openingHeightTestsFailed").attr("download", "OpeningHeightMatchTestData.json")
+        }
+    }
+
+    function makeOpaqueSurfaceHTML(opSurfaceReport)
+    {
+        var totalGBSurfaces = 0;
+        var surfaceMatchedObj = {
+            "Matched": 0,
+            "Not Matched": 0,
+            individualTests: {
+                "Surface Name Match Failed":[],
+                "Surface Type Match Failed": [],
+                "Construction Name Match Failed": [],
+                "Wind Exposure Test Failed": [],
+                "Sun Exposure Test Failed": [],
+                "Adjacency Condition Tests Failed": []
+            }
+        }
+        
+        var html = "";
+        var htmlbreak = "<br />"
+        var endWrap = "<br /></div>"
+        $.each(opSurfaceReport, function (ind, val) {
+            var surfaceNameMatchFailed = false;
+            totalGBSurfaces++;
+            //console.log(ind);
+            if (val.surfMatchOverall) {
+                html = makeHeader("Opaque Surface Test " + (ind + 1) + " : PASS, " + val.gbSurfNm, html);
+                surfaceMatchedObj["Matched"]++;
+            }
+            else {
+                html = makeHeader("Opaque Surface Test " + (ind + 1) + " : FAIL, " + val.gbSurfNm, html);
+                surfaceMatchedObj["Not Matched"]++;
+            }
+            if (val.surfNmMatch) { html += "<div><div class=\"row\"><h4>PASS: Surface Names Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div><div class=\"row\"><h4>FAIL: Surface Names DO NOT Match in gbXML and idf File</h4></div>";
+                var obj = {
+                    name: val.gbSurfNm,
+                    type: val.gbSurfType
+                }
+                surfaceMatchedObj.individualTests["Surface Name Match Failed"].push(obj);
+                surfaceNameMatchFailed = true;
+            }
+            html = makeResultRow("gbXML Name", val.gbSurfNm, "EnergyPlus Name", val.epSurfNm, html, htmlbreak);
+
+            if (val.surfTypeMatch) { html += "<div class=\"row\"><h4>PASS: Surface Construction Type Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Surface Construction Types DO NOT Match in gbXML and idf File</h4></div>";
+                if (surfaceNameMatchFailed) { }
+                else { surfaceMatchedObj.individualTests["Surface Type Match Failed"].push(val.gbSurfNm); }
+
+            }
+            html = makeSubHeader("gbXML Surface Description", "EnergyPlus Surface Description", html);
+            html = makeResultRow("Surface Type", val.gbSurfType, "Surface Type", val.epSurfType, html, htmlbreak);
+
+            if (val.surfConstMatch) { html += "<div class=\"row\"><h4>PASS: Surface Construction Names Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Surface Construction Names DO NOT Match in gbXML and idf File</h4></div>";
+                if (surfaceNameMatchFailed) { }
+                else { surfaceMatchedObj.individualTests["Construction Name Match Failed"].push(val.gbSurfNm); }
+            }
+            html = makeSubHeader("gbXML Surface Description", "EnergyPlus Surface Description", html);
+            html = makeResultRow("Construction Name", val.gbConstName, "Construction Name", val.epConstName, html, htmlbreak);
+
+            if (val.epWindExpMatch) { html += "<div class=\"row\"><h4>PASS: E+ Wind Exposure is Consistent with the Construction Type above.</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: E+ Wind Exposure is NOT Consistent with the Construction Type above.</h4></div>";
+                if (surfaceNameMatchFailed) { }
+                else { surfaceMatchedObj.individualTests["Wind Exposure Test Failed"].push(val.epSurfNm); }
+            }
+            html = makeSubHeader("gbXML Surface Description", "EnergyPlus Surface Description", html);
+            html = makeResultRow("Wind Exposure", val.gbWExp, "Wind Exposure", val.epWExp, html,htmlbreak);
+
+            if (val.epSunExpMatch) { html += "<div class=\"row\"><h4>PASS: E+ Sun Exposure is Consistent with the Construction Type above.</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: E+ Sun Exposure is NOT Consistent with the Construction Type above.</h4></div>";
+                if (surfaceNameMatchFailed) { }
+                else { surfaceMatchedObj.individualTests["Wind Exposure Test Failed"].push(val.epSurfNm); }
+            }
+            html = makeSubHeader("gbXML Surface Description", "EnergyPlus Surface Description", html);
+            html = makeResultRow("Sun Exposure", val.gbSExp, "Sun Exposure", val.epSExp, html,htmlbreak);
+
+            if (val.adjacencyMatch) { html += "<div class=\"row\"><h4>PASS: Surface Adjacency Descriptions Match in gbXML and idf File</h4></div>"; }
+            else {
+                html += "<div class=\"row\"><h4>FAIL: Surface Adjacency Descriptions DO NOT Match in gbXML and idf File</h4></div>";
+                if (surfaceNameMatchFailed) { }
+                else { surfaceMatchedObj.individualTests["Adjacency Condition Tests Failed"].push(val.gbSurfNm); }
+            }
+            html = makeSubHeader("gbXML Surface Description", "EnergyPlus Surface Description", html);
+            html = makeResultRow("Adjacency Count", val.gbAdjCt, "Adjacency Count", val.epAdjCt, html);
+            html = makeResultRow("Adjacencies", val.gbAdjID, "Adjacencies", val.epAdjID, html, endWrap);
+            //console.log(html);
+            //debugger;
+        });
+
+        $("#opaqueAccordions").html(html);
+
+        $("#opaqueAccordions").accordion(
+           {
+               active: false,
+               collapsible: true
+           }
+        );
+        var headers = $(".ui-accordion-header");
+        $.each(headers, function (ind, val) {
+            //search for FAIL
+            var re = new RegExp("FAIL");
+            var res = re.test(val.textContent);
+            if (res) {
+                //console.log(val);
+                val.style.backgroundColor = "#080296";
+            }
+        })
+
+        console.log("Opaque surface match object: ", surfaceMatchedObj);
+        //circle chart
+        var d3Data = [
+            {
+                label: "Surfaces Passing",
+                value: surfaceMatchedObj["Matched"]
+            },
+            {
+                label: "Surfaces Failed",
+                value: surfaceMatchedObj["Not Matched"]
+            }
+        ]
+
+        var surfacesMatchedPercent = (surfaceMatchedObj["Matched"] / totalGBSurfaces)*100;
+        makeCircleChartD3(d3Data, surfacesMatchedPercent.toFixed(1), "#opaqueDonut", "Surfaces Test Pass");
+        //bar chart for surface failure distribution
+        var categories = [""];
+        var values = [0];
+        for (var c in surfaceMatchedObj.individualTests) {
+            categories.push(c);
+            values.push(surfaceMatchedObj.individualTests[c].length)
+        }
+        MakeD3HorizontalBarChartD3(categories, values, "Surface Match Failure Distribution", "steelblue", "#opSurfaceBarDiv");
+        //bar chart for distribution of surface name match failures
+        categories = ["","InteriorFloor","SlabOnGrade","Ceiling","Floor/Ceiling","InteriorWall","ExteriorWall","Roof"];
+        values = [];
+        for (var c in categories)
+        {
+            var res = surfaceMatchedObj.individualTests["Surface Name Match Failed"].filter(function (obj) {
+                return obj.type === categories[c];
+            })
+            values.push(res.length);
+        }
+        console.log("Categories:", categories);
+        console.log("Values:", values);
+        MakeD3HorizontalBarChartD3(categories, values, "Surface Type when Surf Name Match Fails", "aquamarine", "#opSurfaceTypeBarDiv");
+
+        //provide hyperlinks
+        if (surfaceMatchedObj.individualTests["Surface Name Match Failed"].length === 0) {
+            //disable the link
+            $("#surfaceIdTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Surface Name Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#surfaceIdTestsFailed").attr("href", "data:" + testObjectString)
+            $("#surfaceIdTestsFailed").attr("download", "SurfaceIDMatchTestData.json")
+        }
+        if (surfaceMatchedObj.individualTests["Surface Type Match Failed"].length === 0) {
+            //disable the link
+            $("#surfaceTypeTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Surface Type Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#surfaceTypeTestsFailed").attr("href", "data:" + testObjectString)
+            $("#surfaceTypeTestsFailed").attr("download", "SurfaceTypeMatchTestData.json")
+        }
+        if (surfaceMatchedObj.individualTests["Construction Name Match Failed"].length === 0) {
+            //disable the link
+            $("#constructionNameTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Construction Name Match Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#constructionNameTestsFailed").attr("href", "data:" + testObjectString)
+            $("#constructionNameTestsFailed").attr("download", "SurfaceConstructionMatchTestData.json")
+        }
+        if (surfaceMatchedObj.individualTests["Wind Exposure Test Failed"].length === 0) {
+            //disable the link
+            $("#windExposureTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Wind Exposure Test Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#windExposureTestsFailed").attr("href", "data:" + testObjectString)
+            $("#windExposureTestsFailed").attr("download", "EplusWindExpTestData.json")
+        }
+        if (surfaceMatchedObj.individualTests["Sun Exposure Test Failed"].length === 0) {
+            //disable the link
+            $("#sunExposureTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Sun Exposure Test Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#sunExposureTestsFailed").attr("href", "data:" + testObjectString)
+            $("#sunExposureTestsFailed").attr("download", "EplusSunExpTestData.json")
+        }
+        if (surfaceMatchedObj.individualTests["Adjacency Condition Tests Failed"].length === 0) {
+            //disable the link
+            $("#adjacencyConditionTestsFailed").hide()
+        }
+        else {
+            var testObjectString = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(surfaceMatchedObj.individualTests["Adjacency Condition Tests Failed"]));
+            //enable the link and make the link ready to download the file in question
+            $("#adjacencyConditionTestsFailed").attr("href", "data:" + testObjectString)
+            $("#adjacencyConditionTestsFailed").attr("download", "AdjacencyConditionsTestData.json")
+        }
+    }
+
+   function makeConstructionHTML(constructionReport)
+   {
+       var html = "";
+       var htmlbreak = "<br />"
+       var endWrap = "<br /></div>"
+       $.each(constructionReport, function (ind, val) {
+           //console.log(ind);
+           if (val.cMatchOverall) { html = makeHeader("Construction Test " + (ind + 1) + " : PASS, " + val.gbCName, html); }
+           else { html = makeHeader("Construction Test " + (ind + 1) + " : FAIL, " + val.gbCName, html); }
+           if (val.cnameMatch) { html += "<div><div class=\"row\"><h4>PASS: Names Match in gbXML and idf File</h4></div>" }
+           else { html += "<div><div class=\"row\"><h4>FAIL: Names DO NOT Match in gbXML and idf File</h4></div>" }
+           html = makeResultRow("gbXML Name", val.gbCName, "EnergyPlus Name", val.epCName, html, htmlbreak);
+
+           if (val.cMaterialsMatch) { html += "<div class=\"row\"><h4>PASS: Materials in gbXML and idf File have identical properties and are in the same layer sequence</h4></div>" }
+           else { html += "<div class=\"row\">FAIL: Materials in gbXML and idf File DO NOT have identical properties and or are NOT in the same layer sequence</div>" }
+           html = makeSubHeader("gbXML Layers", "EnergyPlus Layers", html);
+           html = makeResultRow("Layer Count", val.gbMatCt, "Layer Count", val.epMatCt, html);
+           html = makeResultRow("Layer Sequence", val.gbMaterials, "Layer Sequence", val.epMaterials, html, htmlbreak);
+
+           html = makeSubHeader("gbXML Material Definition", "Energy Plus Material Definition", html);
+           $.each(val.materialReport, function (ind2, val2) {
+               //console.log(typeof (val2.conductivityRes[1]))
+               html = makeResultRow("Material Name", val2.gbMaterialName, "Material Name", val2.epMaterialName, html);
+               html = makeResultRow("Material Conductivity", val2.conductivityRes[0], "Material Conductivity", val2.conductivityRes[1], html);
+               html = makeResultRow("Conductivity Units", val2.conductivityRes[2], "Conductivity Units", val2.conductivityRes[2], html);
+               html = makeResultRow("Material Sp Ht", val2.sphtRes[0], "Material Sp Ht", val2.conductivityRes[1], html);
+               html = makeResultRow("Specific Ht Units", val2.sphtRes[2], "Specific Ht Units", val2.sphtRes[2], html);
+               html = makeResultRow("Material Density", val2.densityRes[0], "Material Density", val2.densityRes[1], html);
+               html = makeResultRow("Density Units", val2.densityRes[2], "Density Units", val2.densityRes[2], html);
+               html = makeResultRow("Total R-Value", val2.resistanceRes[0], "Total R-Value", val2.resistanceRes[1], html);
+               html = makeResultRow("Resistance Units", val2.resistanceRes[2], "Resistance Units", val2.resistanceRes[2], html);
+
+               if (ind2 === val.materialReport.length - 1) {
+                   html = makeResultRow("Material Thickness", val2.thicknessRes[0], "Material Thickness", val2.thicknessRes[1], html);
+                   html = makeResultRow("Thickness Units", val2.thicknessRes[2], "Thickness Units", val2.thicknessRes[2], html, endWrap);
+               }
+               else {
+                   html = makeResultRow("Material Thickness", val2.thicknessRes[0], "Material Thickness", val2.thicknessRes[1], html);
+                   html = makeResultRow("Thickness Units", val2.thicknessRes[2], "Thickness Units", val2.thicknessRes[2], html, htmlbreak);
+               }
+           })
+           //console.log(html)
+       });
+       
+       $("#constructionAccordions").html(html);
+
+       $("#constructionAccordions").accordion(
+          {
+              active: false,
+              collapsible: true
+          }
+       );
+       var headers = $(".ui-accordion-header");
+       $.each(headers, function (ind, val) {
+           //search for FAIL
+           var re = new RegExp("FAIL");
+           var res = re.test(val.textContent);
+           if (res) {
+               //console.log(val);
+               val.style.backgroundColor = "#080296";
+           }
+       })
+   }
+   
+   function makeOpeningConstructionHTML(constructionReport)
+   {
+       var html = "";
+       var htmlbreak = "<br />"
+       var endWrap = "<br /></div>"
+       $.each(constructionReport, function (ind, val) {
+           console.log(val);
+           if (val.cMatchOverall) { html = makeHeader("Opening Construction Test " + (ind + 1) + " : PASS, " + val.gbCName, html); }
+           else { html = makeHeader("Opening Construction Test " + (ind + 1) + " : FAIL, " + val.gbCName, html); }
+           if (val.cnameMatch) { html += "<div><div class=\"row\"><h4>PASS: Names Match in gbXML and idf File</h4></div>" }
+           else { html += "<div><div class=\"row\"><h4>FAIL: Names DO NOT Match in gbXML and idf File</h4></div>" }
+           html = makeResultRow("gbXML Name", val.gbCName, "EnergyPlus Name", val.epCName, html, htmlbreak);
+           if (val.WindowDefinitionMismatch)
+           {
+               console.log("Opening definition mismatch.")
+               //windows are not defined the same way in both files
+               html += "<div class=\"row\"><h4>FAIL: Opening details are defined differently in gbXML and idf Files</h4></div>"
+               html = makeSubHeader("gbXML Opening Description", "EnergyPlus Opening Description", html);
+               html = makeResultRow("gbGlazing and Gas Layers", val.gbGlazingAndGasLayers, "Material Name", val.epGlazingAndGasLayers, html, endWrap);
+           }
+           else
+           {
+               html += "<div class=\"row\"><h4>PASS: Opening details are defined the same in gbXML and idf Files</h4></div>"
+               console.log("No opening definition mismatch.")
+               html = makeSubHeader("gbXML Opening Description", "EnergyPlus Opening Description", html);
+               var l = val.gbGlazingAndGasLayers.length;
+               while(l--)
+               {
+                   if(l%2===0)
+                   {
+                       if (l === 0)
+                       {
+                           html = makeResultRow("GlazingLayer", val.gbGlazingAndGasLayers[l], "GlazingLayer", val.epGlazingAndGasLayers[l], html, htmlbreak);
+                       }
+                       else
+                       {
+                           html = makeResultRow("GlazingLayer", val.gbGlazingAndGasLayers[l], "GlazingLayer", val.epGlazingAndGasLayers[l], html);
+                       }
+                   }
+                   else
+                   {
+                       html = makeResultRow("GasLayer", val.gbGlazingAndGasLayers[l], "GasLayer", val.epGlazingAndGasLayers[l], html);
+                   }
+               }
+               var g = val.glazingReports.length;
+               var gas = val.gasReports.length;
+               l = g + gas;
+               while(l--)
+               {
+                   
+                   
+                   if (l % 2 === 0)
+                   {
+                       g--;
+                       if(l===0)
+                       {
+                           html = makeSubHeader("gbXML Glazing Description", "EnergyPlus Glazing Description", html);
+                           html = makeResultRow("ThicknessUnits", val.glazingReports[g].thicknessRes[2], "ThicknessUnits", val.glazingReports[g].thicknessRes[2], html);
+                           html = makeResultRow("Thickness", val.glazingReports[g].thicknessRes[0], "Thickness", val.glazingReports[g].thicknessRes[1], html);
+                           html = makeResultRow("Conductivity Units", val.glazingReports[g].conductivityRes[2], "ConductivityUnits", val.glazingReports[g].conductivityRes[2], html);
+                           html = makeResultRow("Conductivity", val.glazingReports[g].conductivityRes[0], "Conductivity", val.glazingReports[g].conductivityRes[1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[0][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[0][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[0][0], "Transmittance", val.glazingReports[g].transmittanceRes[0][1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[1][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[1][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[1][0], "Transmittance", val.glazingReports[g].transmittanceRes[1][1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[2][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[2][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[2][0], "Transmittance", val.glazingReports[g].transmittanceRes[2][1], html);
+
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[0][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[0][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[0][0], "Reflectance", val.glazingReports[g].transmittanceRes[0][1], html);
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[1][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[1][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[1][0], "Reflectance", val.glazingReports[g].transmittanceRes[1][1], html);
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[2][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[2][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[2][0], "Reflectance", val.glazingReports[g].transmittanceRes[2][1], html);
+
+                           html = makeResultRow("EmittanceType", val.glazingReports[g].emittanceRes[0][2], "EmittanceType", val.glazingReports[g].emittanceRes[0][2], html);
+                           html = makeResultRow("Emittance", val.glazingReports[g].emittanceRes[0][0], "Emittance", val.glazingReports[g].emittanceRes[0][1], html);
+                           html = makeResultRow("EmittanceType", val.glazingReports[g].emittanceRes[1][2], "EmittanceType", val.glazingReports[g].emittanceRes[1][2], html);
+                           html = makeResultRow("Emittance", val.glazingReports[g].emittanceRes[1][0], "Emittance", val.glazingReports[g].emittanceRes[1][1], html, endWrap);
+
+                       }
+                       else
+                       {
+                           html = makeSubHeader("gbXML Glazing Description", "EnergyPlus Glazing Description", html);
+                           html = makeResultRow("ThicknessUnits", val.glazingReports[g].thicknessRes[2], "ThicknessUnits", val.glazingReports[g].thicknessRes[2], html);
+                           html = makeResultRow("Thickness", val.glazingReports[g].thicknessRes[0], "Thickness", val.glazingReports[g].thicknessRes[1], html);
+                           html = makeResultRow("Conductivity Units", val.glazingReports[g].conductivityRes[2], "ConductivityUnits", val.glazingReports[g].conductivityRes[2], html);
+                           html = makeResultRow("Conductivity", val.glazingReports[g].conductivityRes[0], "Conductivity", val.glazingReports[g].conductivityRes[1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[0][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[0][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[0][0], "Transmittance", val.glazingReports[g].transmittanceRes[0][1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[1][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[1][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[1][0], "Transmittance", val.glazingReports[g].transmittanceRes[1][1], html);
+                           html = makeResultRow("TransmittanceType", val.glazingReports[g].transmittanceRes[2][2], "TransmittanceType", val.glazingReports[g].transmittanceRes[2][2], html);
+                           html = makeResultRow("Transmittance", val.glazingReports[g].transmittanceRes[2][0], "Transmittance", val.glazingReports[g].transmittanceRes[2][1], html);
+
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[0][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[0][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[0][0], "Reflectance", val.glazingReports[g].transmittanceRes[0][1], html);
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[1][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[1][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[1][0], "Reflectance", val.glazingReports[g].transmittanceRes[1][1], html);
+                           html = makeResultRow("ReflectanceType", val.glazingReports[g].reflectanceRes[2][2], "ReflectanceType", val.glazingReports[g].reflectanceRes[2][2], html);
+                           html = makeResultRow("Reflectance", val.glazingReports[g].transmittanceRes[2][0], "Reflectance", val.glazingReports[g].transmittanceRes[2][1], html);
+
+                           html = makeResultRow("EmittanceType", val.glazingReports[g].emittanceRes[0][2], "EmittanceType", val.glazingReports[g].emittanceRes[0][2], html);
+                           html = makeResultRow("Emittance", val.glazingReports[g].emittanceRes[0][0], "Emittance", val.glazingReports[g].emittanceRes[0][1], html);
+                           html = makeResultRow("EmittanceType", val.glazingReports[g].emittanceRes[1][2], "EmittanceType", val.glazingReports[g].emittanceRes[1][2], html);
+                           html = makeResultRow("Emittance", val.glazingReports[g].emittanceRes[1][0], "Emittance", val.glazingReports[g].emittanceRes[1][1], html, htmlbreak);
+                       }
+                   }
+                   else
+                   {
+                       gas--;
+                       if (gas >= 0)
+                       {
+                           if (gas === 0)
+                           {
+                               html = makeSubHeader("gbXML Gas Description", "EnergyPlus Gas Description", html);
+                               html = makeResultRow("ThicknessUnits", val.gasReports[gas].thicknessRes[2], "ThicknessUnits", val.gasReports[gas].thicknessRes[2], html);
+                               html = makeResultRow("Thickness", val.gasReports[gas].thicknessRes[0], "Thickness", val.gasReports[gas].thicknessRes[1], html);
+                               html = makeResultRow("GasType", gasTypeDict[val.gasReports[gas].gasRes[0]], "GasType", val.gasReports[gas].gasRes[1], html, htmlbreak);
+                           }
+                           else
+                           {
+                               html = makeSubHeader("gbXML Gas Description", "EnergyPlus Gas Description", html);
+                               html = makeResultRow("ThicknessUnits", val.gasReports[gas].thicknessRes[2], "ThicknessUnits", val.gasReports[gas].thicknessRes[2], html);
+                               html = makeResultRow("Thickness", val.gasReports[gas].thicknessRes[0], "Thickness", val.gasReports[gas].thicknessRes[1], html);
+                               html = makeResultRow("GasType", gasTypeDict[val.gasReports[gas].gasRes[0]], "GasType", val.gasReports[gas].gasRes[1], html,htmlbreak);
+                           }
+                       }
+                       
+                   }
+               }
+           }
+       });
+       //console.log(html)
+
+       $("#openingConstructionAccordions").html(html);
+
+       $("#openingConstructionAccordions").accordion(
+          {
+              active: false,
+              collapsible: true
+          }
+       );
+
+       var headers = $(".ui-accordion-header");
+       $.each(headers, function (ind, val) {
+           //search for FAIL
+           var re = new RegExp("FAIL");
+           var res = re.test(val.textContent);
+           if (res) {
+               //console.log(val);
+               val.style.backgroundColor = "#080296";
+           }
+       })
+   }
+
+   function makeScheduleHTML(scheduleReport)
+   {
+       var html = "";
+       var htmlbreak = "<br />"
+       var endWrap = "<br /></div>"
+       $.each(scheduleReport, function (ind, val) {
+           if (val.OverallMatch) { html = makeHeader("Schedule Test " + (ind + 1) + " : PASS, " + val.GbYearScheduleName, html); }
+           else { html = makeHeader("Schedule Test " + (ind + 1) + " : FAIL, " + val.GbYearScheduleName, html); }
+           if (val.YearNameMatch) { html += "<div><div class=\"row\"><h4>PASS: Year Schedule Names Match in gbXML and idf File</h4></div>" }
+           else { html += "<div><div class=\"row\"><h4>FAIL: Year Schedule Names DO NOT Match in gbXML and idf File</h4></div>" }
+           html = makeResultRow("gbXML Name", val.GbYearScheduleName, "EnergyPlus Name", val.EpYearScheduleName, html, htmlbreak);
+
+           if (val.YearTypeMatch) { html += "<div class=\"row\"><h4>PASS: Year Schedule Types Match in gbXML and idf File</h4></div>" }
+           else { html += "<div class=\"row\"><h4>FAIL: Year Schedule Types DO NOT Match in gbXML and idf File</h4></div>" }
+           html = makeResultRow("gbXML Type", val.GbYearType, "EnergyPlus Type", val.EpYearType, html, htmlbreak);
+
+           //parse through the year interval object
+           var yearIntervalLength = val.YearIntervalsObj.length;
+           while(yearIntervalLength--)
+           {
+               if (val.YearIntervalsObj[yearIntervalLength].YrIntervalOverallMatch) { html += "<div class=\"row\"><h4>PASS: Year Schedule Intervals Match in gbXML and idf File</h4></div>" }
+               else { html += "<div class=\"row\"><h4>FAIL: Year Schedule Intervals DO NOT Match in gbXML and idf File</h4></div>" }
+               html = makeSubHeader("gbXML Schedule Intervals", "EnergyPlus Schedule Intervals", html);
+               html = makeResultRow("gbXML Start", val.YearIntervalsObj[yearIntervalLength].GbStart, "EnergyPlus Start", val.YearIntervalsObj[yearIntervalLength].EpStart, html);
+               html = makeResultRow("gbXML End", val.YearIntervalsObj[yearIntervalLength].GbEnd, "EnergyPlus End", val.YearIntervalsObj[yearIntervalLength].EpEnd, html);
+               html = makeResultRow("gbXML Interval Week Sch", val.YearIntervalsObj[yearIntervalLength].GbWeekScheduleRef, "E+ Interval Week Sch", val.YearIntervalsObj[yearIntervalLength].EpWeekScheduleRef, html, htmlbreak);
+           }
+
+           var wkIntLen = val.WeekIntervalsObj.length;
+           while(wkIntLen--)
+           {
+               if (val.WeekIntervalsObj[wkIntLen].WeekIntOverallMatch) { html += "<div class=\"row\"><h4>PASS: Corresponding Week Schedule(s) Match in gbXML and idf File</h4></div>" }
+               else { html += "<div class=\"row\"><h4>FAIL: Corresponding Week Schedule(s) DO NOT Match in gbXML and idf File</h4></div>" }
+               html = makeSubHeader("gbXML Week Schedule", "EnergyPlus Week Schedule", html);
+               html = makeResultRow("gbXML Week Sch Name", val.WeekIntervalsObj[wkIntLen].GbWeekName, "EnergyPlus Week Sch Name", val.WeekIntervalsObj[wkIntLen].EpWeekName, html, htmlbreak);
+               html = makeSubHeader("gbXML Week Day Assignments", "EnergyPlus Week Day Assignments", html);
+               for (var key in val.WeekIntervalsObj[wkIntLen].GbWeek)
+               {
+                   if(val.WeekIntervalsObj[wkIntLen].GbWeek.hasOwnProperty(key))
+                   {
+                       if(val.WeekIntervalsObj[wkIntLen].EpWeek.hasOwnProperty(key))
+                       {
+                           html = makeResultRow(key, val.WeekIntervalsObj[wkIntLen].GbWeek[key], key, val.WeekIntervalsObj[wkIntLen].EpWeek[key], html);
+                       }
+                       else
+                       {
+                           html = makeResultRow(key, val.WeekIntervalsObj[wkIntLen].GbWeek[key], key, val.WeekIntervalsObj[wkIntLen].EpWeek[key.toLowerCase()], html);
+                       }
+                   }
+               }
+           }
+           html += "<br/>"
+           var dyIntLen = val.DayIntervalsObj.length;
+           while(dyIntLen--)
+           {
+               if (val.DayIntervalsObj[dyIntLen].DayIntOverallMatch) { html += "<div class=\"row\"><h4>PASS: Corresponding Day Schedule(s) Match in gbXML and idf File</h4></div>" }
+               else { html += "<div class=\"row\"><h4>FAIL: Corresponding Day Schedule(s) DO NOT Match in gbXML and idf File</h4></div>" }
+               html = makeSubHeader("gbXML Day Schedule", "EnergyPlus Day Schedule", html);
+               html = makeResultRow("Name", val.DayIntervalsObj[dyIntLen].GbDayScheduleRef, "Name", val.DayIntervalsObj[dyIntLen].EpDayScheduleRef, html);
+               html = makeResultRow("Type", val.DayIntervalsObj[dyIntLen].GbDayScheduleType, "TYpe", val.DayIntervalsObj[dyIntLen].EpDayScheduleType, html, htmlbreak);
+
+               var hourlyObjLen = val.DayIntervalsObj[dyIntLen].HourlyValuesObj.length;
+               while(hourlyObjLen--)
+               {
+                   var hr = val.DayIntervalsObj[dyIntLen].HourlyValuesObj[hourlyObjLen].hour;
+                   var epval = val.DayIntervalsObj[dyIntLen].HourlyValuesObj[hourlyObjLen].EpVal;
+                   var gbval = val.DayIntervalsObj[dyIntLen].HourlyValuesObj[hourlyObjLen].GbVal;
+                   if (hourlyObjLen > 0) { html = makeResultRow("Hour " + hr, gbval, "Hour " + hr, epval, html); }
+                   else
+                   {
+                       if (dyIntLen > 0)
+                       {
+                           html = makeResultRow("Hour " + hr, gbval, "Hour " + hr, epval, html, htmlbreak);
+                       }
+                       else
+                       {
+                           html = makeResultRow("Hour " + hr, gbval, "Hour " + hr, epval, html, endWrap);
+                       }
+                   }
+
+               }
+           }
+           
+       });
+
+       $("#scheduleAccordions").html(html);
+
+       $("#scheduleAccordions").accordion(
+          {
+              active: false,
+              collapsible: true
+          }
+       );
+
+       var headers = $(".ui-accordion-header");
+       $.each(headers, function (ind, val) {
+           //search for FAIL
+           var re = new RegExp("FAIL");
+           var res = re.test(val.textContent);
+           if (res) {
+               //console.log(val);
+               val.style.backgroundColor = "#080296";
+           }
+       })
+   }
+
+   //returns the string or a fixed Decimal
+   function getStringOrNumber(item,fix)
+   {
+   
+		if(typeof(item)=== "string")
+		{
+			return item;
+		}
+		else if (typeof(item) === "number")
+		{
+			return item.toFixed(fix)
+		}
+		else if (typeof(item) === "object")
+		{
+			return item;
+		}
+		return "";
+   }
+   //simplified formatting of results
+   function makeHeader(headerValue,htmlAll)
+   {
+		htmlAll+="<h3>"+ headerValue + "</h3>"; 
+		return htmlAll
+   }
+   
+   function makeSubHeader(subheader1, subheader2, htmlAll)
+   {
+		htmlAll+="<div class=\"row\"><div class=\"col-md-6\"><b><u>"+subheader1+"</u></b></div><div class=\"col-md-6\"><b><u>"+subheader2+"</u></b></div></div>";
+		return htmlAll;
+   }
+   
+   function makeResultRow(gbXMLCategory, gbXMLValue, epCategory, epValue, htmlAll, breakpoint)
+   {
+		if (breakpoint)
+		{
+			htmlAll+="<div class=\"row\"><div class=\"col-md-6\"><b>"+gbXMLCategory+"</b> : "+ getStringOrNumber(gbXMLValue,4) +"</div><div class=\"col-md-6\"><b>"+ epCategory +"</b> : "+ getStringOrNumber(epValue,4) +"</div></div>"+breakpoint;
+		}
+		else
+		{
+			htmlAll+="<div class=\"row\"><div class=\"col-md-6\"><b>"+gbXMLCategory+"</b> : "+ getStringOrNumber(gbXMLValue,4) +"</div><div class=\"col-md-6\"><b>"+ epCategory +"</b> : "+ getStringOrNumber(epValue,4) +"</div></div>";
+		}
+		return htmlAll;
+   }
+   
+   //will sort false to true, based on the key that is passed to it
+   //http://stackoverflow.com/questions/8537602/any-way-to-extend-javascripts-array-sort-method-to-accept-another-parameter
+   function compareTF(propKey) {
+	return function(a,b) {
+		return (a[propKey]===b[propKey])? 0 : a[propKey]? 1 : -1;
+	}
+   }
+
+   function makeCircleChartD3(d3Data, percentageMatch, svgName, centerTag) {
+       //tooltip div
+       var div = d3.select("body").append("div")
+            .attr("class", "tooltip donut")
+            .style("opacity", 1e-6);
+
+
+       // Define size & radius of donut pie chart
+       var width = 350,
+           height = 350,
+           radius = Math.min(width, height) / 2;
+       // Define arc colours
+       var color = d3.scale.category10();
+
+       // Define arc ranges
+       var arctText = d3.scale.ordinal()
+           .rangeRoundBands([0, width], 0.1, 0.3);
+       // Determine size of arcs
+       var arc = d3.svg.arc()
+           .innerRadius(radius - 70)
+           .outerRadius(radius - 10);
+       // Create the donut pie chart layout
+       var pie = d3.layout.pie()
+           .value(function (d) { return d.value; })
+           .sort(null);
+       // Append SVG attributes and append g to the SVG
+       var svg = d3.select(svgName)
+           .attr("width", width)
+           .attr("height", height)
+           .append("g")
+               .attr("transform", "translate(" + radius + "," + radius + ")");
+       // Define inner circle
+       svg.append("circle")
+           .attr("cx", 0)
+           .attr("cy", 0)
+           .attr("r", radius)
+           .attr("fill", "#fff");
+       // Calculate SVG paths and fill in the colours
+       var g = svg.selectAll(".arc")
+           .data(pie(d3Data))
+         .enter().append("g")
+           .attr("class", "arc");
+       // Append the path to each g
+       g.append("path")
+           .attr("d", arc)
+           .attr("fill", function (d, i) {
+               return color(i);
+           })
+          .on("mouseover", function (d) {
+              //console.log("Mouseover:",this)
+              d3.select(this).style("opacity", 0.5);
+              div.transition()
+                  .duration(200)
+                  .style("opacity", .9);
+              //console.log(this);
+
+          })
+          .on("mousemove", function (d) {
+              //console.log(d)
+              div.html(d.data.label + "<br/>" + d.data.value)
+                .style("left", (d3.event.pageX + 25) + "px")
+                .style("top", (d3.event.pageY - 20) + "px");
+              //console.log(div);
+          })
+          .on("mouseout", function (d) {
+              //console.log("Mouseout: ", this)
+              d3.select(this).style("opacity", 1);
+              div.transition()
+                  .duration(500)
+                  .style("opacity", 0);
+          });
+       // Append text labels to each arc
+       //g.append("text")
+       //    .attr("tranform", function (d) {
+       //        return "translate(" + arc.centroid(d) + ")";
+       //    })
+       //    .attr("dy", "0em")
+       //    .attr("text-anchor", "middle")
+       //    .attr("fill", "#fff")
+       //    .text(function (d, i) { return d3Data[i].label; })
+
+       //not wrapping
+       //g.selectAll(".arc text")
+       //    .call(wrap, arctText.rangeBand());
+       //Append text to the inner circle
+
+
+       svg.append("text")
+           .attr("dy", "0em")
+           .style("text-anchor", "middle")
+           .attr("class", "inner-circle")
+           .attr("fill", "#36454f")
+           .text(function (d) { return centerTag; })
+
+       svg.append("text")
+           .attr("dy", "2.0em")
+           .style("text-anchor", "middle")
+           .attr("class", "inner-circle")
+           .attr("fill", "#36454f")
+           .text(function (d) { return percentageMatch + "%"; })
+
+       svg.append("text")
+           .attr("dy", "1.0em")
+           .style("text-anchor", "middle")
+           .attr("class", "inner-circle")
+           .attr("fill", "#36454f")
+           .text(function (d) { return "Rate" })
+
+       // Wrap function to handle labels with longer text
+       function wrap(text, width) {
+           text.each(function () {
+               var text = d3.select(this),
+                   words = text.text().split(/\s+/).reverse(),
+                   word,
+                   line = [],
+                   lineNumber = 0,
+                   lineHeight = 1.1, // ems
+                   y = text.attr("y"),
+                   dy = parseFloat(text.attr("dy")),
+                   tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+               console.log("tspan: " + tspan);
+               while (word = words.pop()) {
+                   line.push(word);
+                   tspan.text(line.join(" "));
+                   if (tspan.node().getComputedTextLength() > 90) {
+                       line.pop();
+                       tspan.text(line.join(" "));
+                       line = [word];
+                       tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                   }
+               }
+           });
+       };
+   }
+   function MakeD3HorizontalBarChartD3(categories,values, xAxisText, barcolor,divname) {
+       
+       console.log("Categories:", categories.length);
+       console.log("Values:", values);
+       //var colors = d3.scale.category20b;
+       
+       var padding = 2;
+       var width = 800
+       var height = 350
+       var yaxPad = 250;
+       var xaxPad = 40;
+       var padTop = 20;
+       var padRight = 20;
+       var barHeight = ((height - xaxPad - padTop) / categories.length) - padding * 2;
+
+       var xScale = d3.scale.linear()
+           .domain([0, d3.max(values)])
+           .range([0, (width - yaxPad - padRight)]);
+
+       var yScale = d3.scale.linear()
+           .domain([0, categories.length])
+           .range([0, (height - xaxPad - padding - padTop)]);
+
+       var canvas = d3.select(divname)
+           .append("svg")
+           .attr("width", width)
+           .attr("height", height);
+
+       canvas.append("text")
+           .attr("dy", (height - 2))
+           .attr("dx", (width / 2))
+           .attr("style", "font-weight:bold")
+           .text(function (d) { return xAxisText })
+
+       var xAxis = d3.svg.axis()
+           .orient("bottom")
+           .scale(xScale)
+           .tickSize(1);
+
+       var yAxis = d3.svg.axis()
+           .orient("left")
+           .scale(yScale)
+           .tickSize(1)
+           .tickFormat(function (d, i) { return categories[i]; })
+           .tickValues(d3.range(categories.length));
+       
+       var y_xis = canvas.append('g')
+                         .attr("transform", "translate(" + yaxPad + "," + padTop + ")")
+                         .attr('id', ('yaxis'+(Math.random()*100).toString()))
+                         .call(yAxis);
+
+       var x_xis = canvas.append('g')
+                         .attr("transform", "translate(" + yaxPad + "," + (height - xaxPad) + ")")
+                         .attr('id', ('xaxis'+(Math.random()*100).toString()))
+                         .call(xAxis);
+
+       var chart = canvas.append("g")
+           .attr("transform", "translate(" + yaxPad + ",0)")
+           .attr("id", "bars")
+           .selectAll("rect")
+           .data(values)
+           .enter()
+           .append("rect")
+           .attr("height", barHeight)
+           .attr("x", 0)
+           .attr("y", function (d, i) { return (yScale(i)); })
+           .attr("width", function (d, i) { return xScale(d); })
+           .attr("fill", barcolor);
+   }
+</script>
