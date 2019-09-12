@@ -1,4 +1,4 @@
-# gbXML-to-IDF-Test-Cases / Krishnans Load Calculation 2016 Revit gbXML Test Results Read Me
+# gbXML to IDF Test Cases / Krishnans Load Calculation 2016 Revit gbXML Test Results Read Me
 
 Part of a series of test cases developed for Autodesk that converts gbXML to IDF (EnergyPlus) files
 
