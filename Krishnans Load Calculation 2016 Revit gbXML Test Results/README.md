@@ -8,5 +8,5 @@ Click the link below to view the test results
 
 Click the link below to view the gbXML file in 3D:
 
-[gbXML Standard Test Model 2016.xml]( https://www.ladybug.tools/spider-gbxml-tools/spider-gbxml-viewer/#https://GreenBuildingXML.github.io/gbXML-to-IDF-Test-Cases/Krishnans%20Load%20Calculation%202016%20Revit%20gbXML%20Test%20Results/gbXML%20File/gbXMLStandard%20Test%20Model%202016.xml )
+* [gbXML Standard Test Model 2016.xml]( https://www.ladybug.tools/spider-gbxml-tools/spider-gbxml-viewer/#https://GreenBuildingXML.github.io/gbXML-to-IDF-Test-Cases/Krishnans%20Load%20Calculation%202016%20Revit%20gbXML%20Test%20Results/gbXML%20File/gbXMLStandard%20Test%20Model%202016.xml )
 
